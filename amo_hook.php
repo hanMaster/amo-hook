@@ -101,7 +101,7 @@ function process_lead($amo, $lead)
         'content' => $res_json
     ]];
     $context = stream_context_create($opts);
-    $result = file_get_contents('https://dnsexpert.lk.wellsoft.pro/Synchronization', false, $context);
+    $result = file_get_contents($_ENV['SYNC_URL'], false, $context);
     log_to_file('Получен ответ: ' . $result);
 }
 
@@ -114,7 +114,8 @@ try {
     return;
 }
 
-log_to_file('Сработал WEBHOOK: ' . print_r($data, true));
+//log_to_file('Сработал WEBHOOK: ' . print_r($data, true));
+log_to_file('Сработал WEBHOOK');
 
 $amo = new Client(
     $_ENV['AMO_DOMAIN'],
