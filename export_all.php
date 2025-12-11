@@ -52,10 +52,13 @@ $amo = new Client(
 
 $result = ['users' => []];
 $offset = 0;
+
+echo date("Y-m-d H:i:s") . ' Started'  . PHP_EOL;
+
 do {
     $leads = $amo->lead->apiList(['status' => [80709866], 'limit_rows' => 500, 'limit_offset' => $offset]);
     foreach ($leads as $lead) {
-//         print_r($lead);
+         print_r('process lead: '. $lead['id'] . PHP_EOL);
 //         die;
         if ($lead['main_contact_id'] && get_cf(1578533, $lead)) {
             $links = $amo->links->apiList([
@@ -74,6 +77,7 @@ do {
                         'Email' => get_cf(1396597, $contact),
                         'Clientid' => intval(get_cf(1578533, $lead)),
                     ];
+                    print_r('user found: '. $contact['id'] . PHP_EOL);
                 }
             }
         }
@@ -83,3 +87,5 @@ do {
 
 
 file_put_contents('export.json', json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+echo date("Y-m-d H:i:s") . ' Finished';
