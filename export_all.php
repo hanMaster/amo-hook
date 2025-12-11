@@ -59,7 +59,6 @@ do {
     $leads = $amo->lead->apiList(['status' => [80709866], 'limit_rows' => 500, 'limit_offset' => $offset]);
     foreach ($leads as $lead) {
          print_r('process lead: '. $lead['id'] . PHP_EOL);
-//         die;
         if ($lead['main_contact_id'] && get_cf(1578533, $lead)) {
             $links = $amo->links->apiList([
                 'from' => 'leads',
@@ -86,6 +85,6 @@ do {
 } while (count($leads) == 500);
 
 
-file_put_contents('export.json', json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+file_put_contents('export'. date("_Y-m-d_H-i-s") .'.json', json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
 echo date("Y-m-d H:i:s") . ' Finished';
