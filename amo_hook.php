@@ -48,8 +48,8 @@ function get_cf($id, $obj)
 function process_lead($amo, $lead)
 {
     // Проверка этапа воронки (нам нужна этап "Передача ЖК")
-    if ($lead['status_id'] !== 80709866) {
-        log_to_file('Сделка из неправильного этапа');
+    if ($lead['status_id'] !== '80709866') {
+        log_to_file( 'Этап: ' . $lead['status_id'] . ' Сделка из неправильного этапа');
         return;
     }
 
