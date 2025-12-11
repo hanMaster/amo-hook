@@ -87,4 +87,4 @@ do {
 
 file_put_contents('export'. date("_Y-m-d_H-i-s") .'.json', json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-echo date("Y-m-d H:i:s") . ' Finished';
+echo date("Y-m-d H:i:s") . ' Finished' . PHP_EOL;
