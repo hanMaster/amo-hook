@@ -4,6 +4,11 @@ use AmoCRM\Client;
 
 require_once __DIR__ . '/amocrm.phar';
 
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/amo_error.log');
+error_reporting(E_ALL);
+ignore_user_abort(true);
+
 /**
  * @throws Exception
  */
@@ -44,6 +49,12 @@ function get_cf($id, $obj)
     }
 }
 
+function idExists(string $str, int $search): bool
+{
+    $ids = array_map('intval', explode(',', $str));
+    return in_array($search, $ids, true);
+}
+
 
 function process_lead($amo, $lead)
 {
@@ -71,11 +82,18 @@ function process_lead($amo, $lead)
         return;
     }
 
+    // Проверка установки ID собственников
+    $owner_ids = get_cf(1659561, $lead);
+    if (!isset($owner_ids)) {
+        log_to_file('В сделке не заполнен ID собственников');
+        return;
+    }
+
     // Парсинг контактов сделки, выбираем только собственников
     $result = ['users' => []];
     foreach ($links as $link) {
         $contact = $amo->contact->apiList(['id' => $link['to_id']])[0];
-        $is_owner = get_cf(1632282, $contact);
+        $is_owner = idExists($owner_ids, intval($contact['id']));
         if (isset($is_owner) && $is_owner) {
             $result['users'][] = [
                 'Name' => get_cf(1578455, $contact),
@@ -142,7 +160,12 @@ if (array_key_exists('leads', $data)) {
     foreach (['update', 'add'] as $action) {
         if (array_key_exists($action, $data['leads'])) {
             foreach ($data['leads'][$action] as $lead) {
-                process_lead($amo, $lead);
+                try {
+                    // тяжёлая обработка — теперь её ошибки в amo_error.log
+                    process_lead($amo, $lead);
+                } catch (\Throwable $e) {
+                    error_log('amo hook: ' . $e->getMessage());
+                }
             }
         }
     }
