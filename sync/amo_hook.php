@@ -105,7 +105,22 @@ function process_lead($amo, $lead)
     log_to_file('Получен ответ: ' . $result);
 }
 
+
+// Сразу отдаём 200 и закрываем соединение
+http_response_code(200);
+header('Content-Length: 0');
+
+if (function_exists('fastcgi_finish_request')) {
+    fastcgi_finish_request();   // amoCRM получил 200 и отключился
+    log_to_file("fastcgi finish request called");
+}
+set_time_limit(0);
+
+log_to_file("Start of script: Отправлен ответ 200");
+
 $data = $_REQUEST;
+
+date_default_timezone_set('Asia/Vladivostok');
 
 try {
     loadEnv(__DIR__ . '/.env');
@@ -131,4 +146,8 @@ if (array_key_exists('leads', $data)) {
             }
         }
     }
+} else {
+    log_to_file('Не сделка, пропускаем');
 }
+
+log_to_file("End of script\n");
